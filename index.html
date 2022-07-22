@@ -33,7 +33,7 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 	<script>
-    let margin = {top: 20, right: 55, bottom: 30, left: 50},
+    let margin = {top: 20, right: 60, bottom: 30, left: 50},
         width = 700 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -42,6 +42,8 @@
 
     let x_1 = d3.scaleTime().range([0, width]);
     let y_1 = d3.scaleLinear().range([height, 0]);
+
+    let x_2 = d3.scaleBand().range([0, width]);
 
     let valueline = d3.line()
         .x(function(d) { return x_1(d.date); })
@@ -144,6 +146,7 @@
 
         x_1.domain(d3.extent(data, function(d) { return d.date; }));
         y_1.domain([0, 6]);
+        x_2.domain(data.map(function(d) { return d.date; }));
 
         d3.select("#annotation-group").remove();
 
@@ -229,6 +232,7 @@
           .style("text-anchor", "middle")
           .text("# of complaints (M)");
 
+
         svg1.selectAll('circle')
             .data(data)
             .enter()
@@ -250,26 +254,53 @@
             .duration(1000)
             .attr('cx', function(d) {
                     return x_1(d.date)
-                    })
+            })
             .attr('cy', function(d) {
                     return y_1(d.close)
-                    });
+            });
+        
+         let focus = svg1.append("g")
+            .attr("class", "focus")
+            .style("display", "none");
 
-        svg1.selectAll('circle')
-            .on('mouseover', function(event, d){ 
-              tooltip_1.transition()
-                 .duration(200)
-                 .style("opacity", 1);
-              tooltip_1.html(formatDate(d.date) + ": " + d.close.toFixed(2) + 'M')
-                 .style("left", (event.pageX) + "px")
-                 .style("top", (event.pageY - 50) + "px");
-              d3.select(this).transition().attr('r',9);
-            })
-            .on('mouseout', function(d){ 
-              tooltip_1.transition()
-                 .duration(500)
-                 .style("opacity", 0);
-              d3.select(this).transition().attr('r',4);
+        focus.append("circle")
+            .attr("r", 7);
+
+        focus.append("rect")
+            .attr("class", "tooltip")
+            .attr("width", 45)
+            .attr("height", 50)
+            .attr("x", 10)
+            .attr("y", -22)
+            .attr("rx", 4)
+            .attr("ry", 4);
+
+        focus.append("text")
+            .attr("class", "tooltip-date")
+            .attr("x", 18)
+            .attr("y", -2);
+
+        focus.append("text")
+            .attr("class", "tooltip-value")
+            .attr("x", 18)
+            .attr("y", 18);
+
+        svg1.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+              .attr("class", "overlay")
+              .attr("x", function(d) { return x_2(d.date); })
+              .attr("y", function(d) { return 0; })
+              .attr("width", x_2.bandwidth())
+              .attr("height", function(d) { return height; })
+            .on("mouseover", function() { focus.style("display", null); })
+            .on("mouseout", function() { focus.style("display", "none"); })
+            .on('mouseover', function(event, d){
+              focus.style("display", 'block')
+              focus.attr("transform", "translate(" + x_1(d.date) + "," + y_1(d.close) + ")");
+              focus.select(".tooltip-date").text(formatDate(d.date));
+              focus.select(".tooltip-value").text(d.close.toFixed(2));
             })
 
           }
