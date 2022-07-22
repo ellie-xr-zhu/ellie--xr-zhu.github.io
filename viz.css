@@ -32,7 +32,7 @@ body .hed {
   stroke-width: 3px;
 }
 
-#chart1 .tooltip {
+/*#chart1 .tooltip {
   position: absolute;
   text-align: center;
   width: 150px;
@@ -44,7 +44,7 @@ body .hed {
   border: 1px solid #777;
   border-radius: 3px;
   pointer-events: none;
-}
+}*/
 
 .btn-group {
     position: relative;
@@ -130,4 +130,32 @@ input[type=checkbox], input[type=radio] {
 .btn:hover {
     background-color: #eee;
     cursor: pointer;
+}
+
+rect.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.focus circle {
+    fill: #ffa701;
+    stroke:  #777;
+    stroke-width:  2;
+}
+
+.focus text {
+    font-size: 14px;
+}
+
+.tooltip {
+    fill: white;
+    stroke: #000;
+}
+
+.tooltip-value{
+    font-weight: bold;
+}
+
+.annotation-note {
+    pointer-events: none;
 }
